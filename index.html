@@ -440,29 +440,48 @@
             if (e.target === modal) modal.classList.remove('open');
         });
 
-        // 3. 表單送出 (目前為前端模擬)
-        function handleFormSubmit(event) {
+        // 3. 表單送出 (正式版：串接 Notion)
+        async function handleFormSubmit(event) {
             event.preventDefault();
             
+            const btn = event.target.querySelector('.submit-btn');
+            const originalText = btn.textContent;
+            
+            // 鎖定按鈕避免重複發送
+            btn.textContent = "資料傳送中...";
+            btn.style.background = "#9CA3AF";
+            btn.disabled = true;
+
             // 收集資料
             const formData = new FormData(event.target);
             const data = Object.fromEntries(formData.entries());
-            
-            console.log('收集到的報名資料:', data);
-            
-            // 模擬成功
-            const btn = event.target.querySelector('.submit-btn');
-            const originalText = btn.textContent;
-            btn.textContent = "傳送中...";
-            btn.style.background = "#9CA3AF";
 
-            setTimeout(() => {
-                alert(`謝謝 ${data.name}，我們已收到您的回覆！\n(備註：這是一個前端演示，資料已印在 Console 中)`);
-                modal.classList.remove('open');
-                btn.textContent = "已報名";
+            try {
+                // 呼叫我們剛剛寫好的後端程式
+                const response = await fetch('/api/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(`謝謝 ${data.name}，我們已成功收到您的回覆！`);
+                    document.getElementById('rsvpModal').classList.remove('open');
+                    btn.textContent = "已報名成功";
+                    btn.style.background = "var(--accent)";
+                } else {
+                    throw new Error(result.error || '傳送失敗');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('抱歉，傳送發生錯誤，請稍後再試，或是直接聯繫主辦人。\n錯誤原因：' + error.message);
+                // 失敗後恢復按鈕
+                btn.textContent = originalText;
                 btn.style.background = "var(--accent)";
-                btn.disabled = true;
-            }, 1000);
+                btn.disabled = false;
+            }
         }
     </script>
 </body>
