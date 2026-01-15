@@ -4,19 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>65 壽宴｜光影與詩的夜晚</title>
+    
+    <meta property="og:title" content="65 壽宴｜光影與詩的夜晚">
+    <meta property="og:description" content="誠摯邀請您，與把生活拍成影像、寫成詩的人，留下一張值得回看的合照。">
+    <meta property="og:url" content="https://invitation-david65.vercel.app/">
+    <meta property="og:type" content="website">
+
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         /* --- Design Tokens --- */
         :root {
-            --bg: #F6F3EE;         /* 暖灰米白 */
-            --text: #1F2937;       /* 深灰黑 */
-            --muted: #6B7280;      /* 次要文字 */
-            --card-bg: #FFFFFF;    /* 卡片白 */
-            --accent: #8B6B2E;     /* 金棕色 (重點) */
-            --primary: #2C3E50;    /* 深藍灰 (主色) */
-            --line: #E5E7EB;       /* 分隔線 */
-            --font-serif: 'Noto Serif TC', 'Songti TC', serif; /* 詩意字體 */
-            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; /* 資訊字體 */
+            --bg: #F6F3EE;         
+            --text: #1F2937;       
+            --muted: #6B7280;      
+            --card-bg: #FFFFFF;    
+            --accent: #8B6B2E;     
+            --primary: #2C3E50;    
+            --success: #10B981;    
+            --error: #EF4444;      
+            --line: #E5E7EB;       
+            --font-serif: 'Noto Serif TC', 'Songti TC', serif; 
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         * { box-sizing: border-box; }
@@ -29,14 +37,12 @@
             display: flex;
             justify-content: center;
             min-height: 100vh;
-            /* 手機版防滑動過度 */
             overscroll-behavior: none; 
         }
 
-        /* --- 容器與佈局 --- */
         .container {
             width: 100%;
-            max-width: 450px; /* 手機優先，限制最大寬度 */
+            max-width: 450px;
             padding: 20px;
             display: flex;
             flex-direction: column;
@@ -44,11 +50,10 @@
             position: relative;
         }
 
-        /* --- 卡片互動區 (Flip Card) --- */
         .card-wrapper {
             perspective: 1000px;
             width: 100%;
-            height: 550px; /* 卡片高度 */
+            height: 720px; /* 高度維持以容納內容 */
             margin-top: 20px;
             cursor: pointer;
         }
@@ -80,7 +85,7 @@
             align-items: center;
         }
 
-        /* --- 卡片正面 --- */
+        /* --- 正面 --- */
         .front {
             justify-content: center;
             border: 1px solid var(--line);
@@ -98,6 +103,14 @@
             position: relative;
         }
 
+        .title-sub {
+            font-size: 0.9rem;
+            color: var(--accent);
+            letter-spacing: 0.1em;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+        }
+
         .title-main {
             font-family: var(--font-serif);
             font-size: 2rem;
@@ -107,14 +120,6 @@
             text-align: center;
         }
 
-        .title-sub {
-            font-size: 0.9rem;
-            color: var(--accent);
-            letter-spacing: 0.1em;
-            margin-bottom: 2rem;
-            text-transform: uppercase;
-        }
-
         .tap-hint {
             margin-top: 3rem;
             font-size: 0.8rem;
@@ -122,178 +127,143 @@
             animation: pulse 2s infinite;
         }
 
-        /* --- 卡片背面 (內容區) --- */
+        /* --- 背面 --- */
         .back {
             transform: rotateY(180deg);
-            padding: 30px 20px;
+            padding: 25px 20px;
             text-align: center;
-            overflow-y: auto; /* 內容多時可捲動 */
+            overflow-y: auto;
         }
 
         .poem-section {
-            margin-bottom: 25px;
-            padding-bottom: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
             border-bottom: 1px solid var(--line);
             width: 100%;
         }
 
+        .poem-tag {
+            font-size: 0.75rem;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
         .poem-text {
             font-family: var(--font-serif);
-            font-size: 1.25rem;
+            font-size: 1.05rem;
             line-height: 1.6;
             color: var(--primary);
             font-style: italic;
             margin: 0;
-            white-space: pre-line; /* 保留換行 */
+            white-space: pre-line;
         }
 
-        .intro-text {
-            font-size: 0.95rem;
-            color: var(--muted);
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 10px 15px;
-            text-align: left;
-            font-size: 0.95rem;
-            color: var(--text);
-            margin-bottom: 25px;
-            background: #F9FAFB;
-            padding: 15px;
+        .quiz-section {
+            width: 100%;
+            background: #FDFBF7;
+            border: 1px dashed var(--accent);
             border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: left;
         }
 
-        .info-label {
+        .quiz-title {
+            font-size: 0.9rem;
             color: var(--accent);
             font-weight: bold;
-            font-family: var(--font-serif);
+            margin-bottom: 10px;
+            text-align: center;
         }
 
-        .rsvp-btn {
-            background-color: var(--primary);
-            color: #fff;
-            border: none;
-            padding: 14px 40px;
+        .quiz-question {
             font-size: 1rem;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(31, 41, 55, 0.2);
-            transition: transform 0.2s;
-            width: 100%;
-            margin-top: auto;
-        }
-
-        .rsvp-btn:active { transform: scale(0.98); }
-
-        /* --- Modal 表單 (隱藏層) --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            justify-content: center;
-            align-items: flex-end; /* 手機版從下方滑出 */
-            z-index: 999;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal-overlay.open {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal-content {
-            background: #fff;
-            width: 100%;
-            max-width: 450px;
-            border-radius: 20px 20px 0 0;
-            padding: 30px;
-            max-height: 90vh;
-            overflow-y: auto;
-            transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-
-        .modal-overlay.open .modal-content {
-            transform: translateY(0);
-        }
-
-        .form-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .form-title {
-            font-family: var(--font-serif);
-            font-size: 1.5rem;
+            font-weight: bold;
             color: var(--primary);
-            margin: 0;
+            margin-bottom: 12px;
         }
 
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
+        .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+
+        .quiz-btn {
+            background: #fff; border: 1px solid #D1D5DB; padding: 8px 12px;
+            border-radius: 6px; text-align: left; cursor: pointer;
+            transition: all 0.2s; font-size: 0.9rem; color: var(--text);
+        }
+        .quiz-btn:hover { border-color: var(--accent); background: #FFFBEB; }
+        .quiz-btn.correct { background: var(--success); color: white; border-color: var(--success); }
+        .quiz-btn.wrong { background: var(--error); color: white; border-color: var(--error); animation: shake 0.4s; }
+
+        .quiz-feedback { font-size: 0.85rem; margin-top: 10px; text-align: center; min-height: 1.2em; }
+
+        .info-grid {
+            display: grid; grid-template-columns: auto 1fr; gap: 8px 12px;
+            text-align: left; font-size: 0.9rem; color: var(--text);
+            margin-bottom: 20px; background: #F9FAFB; padding: 12px; border-radius: 8px;
+        }
+        .info-label { color: var(--accent); font-weight: bold; font-family: var(--font-serif); }
+        
+        .transport-info {
+            grid-column: 1 / -1;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed var(--line);
+            font-size: 0.85rem;
             color: var(--muted);
         }
+        .transport-item { display: flex; gap: 5px; margin-bottom: 4px; }
 
-        /* --- 表單樣式 --- */
+        .rsvp-btn {
+            background-color: var(--primary); color: #fff; border: none; padding: 14px 40px;
+            font-size: 1rem; border-radius: 50px; cursor: pointer;
+            box-shadow: 0 4px 12px rgba(31, 41, 55, 0.2); width: 100%; margin-top: auto;
+        }
+        .rsvp-btn:active { transform: scale(0.98); }
+
+        /* Modal & Form */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: flex-end;
+            z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background: #fff; width: 100%; max-width: 450px;
+            border-radius: 20px 20px 0 0; padding: 30px;
+            max-height: 90vh; overflow-y: auto;
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .modal-overlay.open .modal-content { transform: translateY(0); }
+        .form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .form-title { font-family: var(--font-serif); font-size: 1.5rem; color: var(--primary); margin: 0; }
+        .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--muted); }
         .form-group { margin-bottom: 15px; text-align: left; }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 0.9rem;
-            color: var(--text);
-            font-weight: 500;
-        }
-
+        label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: var(--text); font-weight: 500; }
         input[type="text"], input[type="number"], select, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            font-size: 1rem;
-            background: #F9FAFB;
-            font-family: var(--font-sans);
+            width: 100%; padding: 12px; border: 1px solid var(--line);
+            border-radius: 8px; font-size: 1rem; background: #F9FAFB; font-family: var(--font-sans);
         }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--accent);
-            background: #fff;
-        }
-
         .radio-group { display: flex; gap: 15px; }
         .radio-label { display: flex; align-items: center; gap: 5px; font-weight: normal;}
-
         .submit-btn {
-            width: 100%;
-            padding: 15px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin-top: 10px;
-            cursor: pointer;
+            width: 100%; padding: 15px; background: var(--accent); color: white;
+            border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold;
+            margin-top: 10px; cursor: pointer;
         }
 
         @keyframes pulse {
             0%, 100% { opacity: 0.6; transform: translateY(0); }
             50% { opacity: 1; transform: translateY(-5px); }
         }
-
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
     </style>
 </head>
 <body>
@@ -306,25 +276,33 @@
                         <div class="title-sub">INVITATION</div>
                         <div class="title-main">光影與詩<br>的夜晚</div>
                         <div style="font-size: 3rem; color:var(--accent); margin: 20px 0;">❦</div>
-                        <div class="tap-hint">點擊開啟您的專屬詩句</div>
+                        <div class="tap-hint">點擊開啟 · 默契大考驗</div>
                     </div>
                 </div>
 
                 <div class="card-face back">
                     <div class="poem-section">
+                        <div class="poem-tag">David 原創詩選</div>
                         <p class="poem-text" id="randomPoem">...</p>
                     </div>
 
-                    <div class="intro-text">
-                        <p>誠摯邀請您，<br>與把生活拍成影像、寫成詩的人，<br>留下一張值得回看的合照。</p>
+                    <div class="quiz-section" id="quizContainer">
+                        <div class="quiz-title">🧩 David 默契大考驗</div>
+                        <div id="quizContent"></div>
+                        <div class="quiz-feedback" id="quizFeedback"></div>
                     </div>
 
                     <div class="info-grid">
                         <div class="info-label">時間</div>
-                        <div>2026/02/07 (六) 17:30 入座</div>
+                        <div>2026/02/07 (六) 17:30</div>
                         
                         <div class="info-label">地點</div>
-                        <div>碧海廚房－敦北店<br><span style="font-size:0.85rem; color:var(--muted)">臺北市松山區敦化北路155巷10號1樓</span></div>
+                        <div>碧海廚房－敦北店<br><span style="font-size:0.85rem; color:var(--muted)">北市松山區敦化北路155巷10號1樓</span></div>
+                        
+                        <div class="transport-info">
+                            <div class="transport-item">🚇 <strong>捷運+步行：</strong>小巨蛋站 1 號出口，步行約 8 分鐘</div>
+                            <div class="transport-item">🚗 <strong>開車前往：</strong>建議停放於臺北田徑場停車場</div>
+                        </div>
                     </div>
 
                     <button class="rsvp-btn" id="openFormBtn">確認出席，與您相聚</button>
@@ -345,54 +323,59 @@
                     <label>您的姓名 / 暱稱 <span style="color:red">*</span></label>
                     <input type="text" name="name" required placeholder="請輸入姓名">
                 </div>
-
                 <div class="form-group">
-                    <label>出席狀態</label>
+                    <label>出席狀態 <span style="color:red">*</span></label>
                     <div class="radio-group">
-                        <label class="radio-label"><input type="radio" name="attendance" value="出席" checked> 準時出席</label>
+                        <label class="radio-label"><input type="radio" name="attendance" value="出席" checked required> 準時出席</label>
                         <label class="radio-label"><input type="radio" name="attendance" value="遺憾缺席"> 遺憾缺席</label>
                     </div>
                 </div>
-
                 <div class="form-group">
-                    <label>出席人數 (含您自己)</label>
-                    <input type="number" name="people" value="1" min="1" max="5">
+                    <label>出席人數 <span style="color:red">*</span></label>
+                    <input type="number" name="people" value="1" min="1" max="5" required>
                 </div>
-
                 <div class="form-group">
-                    <label>飲食習慣</label>
+                    <label>飲食習慣 <span style="color:red">*</span></label>
                     <div class="radio-group">
-                        <label class="radio-label"><input type="radio" name="dietType" value="葷" checked> 葷食</label>
+                        <label class="radio-label"><input type="radio" name="dietType" value="葷" checked required> 葷食</label>
                         <label class="radio-label"><input type="radio" name="dietType" value="素"> 素食</label>
                     </div>
                 </div>
-
                 <div class="form-group">
-                    <label>飲食禁忌 / 過敏</label>
-                    <input type="text" name="restrictions" placeholder="無請填「無」">
+                    <label>飲食禁忌 / 過敏 (無請填「無」) <span style="color:red">*</span></label>
+                    <input type="text" name="restrictions" required placeholder="無請填「無」">
                 </div>
-
                 <div class="form-group">
-                    <label>飲酒習慣</label>
-                    <select name="noAlcohol">
+                    <label>飲酒習慣 <span style="color:red">*</span></label>
+                    <select name="noAlcohol" required>
                         <option value="否">可以小酌</option>
                         <option value="是">當天完全不飲酒</option>
                     </select>
                 </div>
-
-                <div class="form-group">
-                    <label>給壽星的備註 (選填)</label>
-                    <textarea name="note" rows="2" placeholder="想說的話..."></textarea>
+                
+                <div class="form-group" style="background: #FFFBEB; padding: 10px; border-radius: 8px;">
+                    <label>20:30 用餐後，會想要續攤嗎？ <span style="color:red">*</span></label>
+                    <div class="radio-group">
+                        <label class="radio-label"><input type="radio" name="afterParty" value="想參加" required> 想參加</label>
+                        <label class="radio-label"><input type="radio" name="afterParty" value="先不用"> 先不用</label>
+                        <label class="radio-label"><input type="radio" name="afterParty" value="看當天狀況"> 看狀況</label>
+                    </div>
                 </div>
 
+                <div class="form-group">
+                    <label>給壽星的一句祝福 <span style="color:red">*</span></label>
+                    <textarea name="note" rows="2" required placeholder="請留下一句話..."></textarea>
+                </div>
                 <button type="submit" class="submit-btn">確認送出</button>
             </form>
         </div>
     </div>
 
     <script>
-        // --- 資料：詩集庫 (來自您的圖片) ---
+        // --- 1. 詩詞 (新舊整合共12首) ---
         const poems = [
+            "相遇，其實是借對方的光，來看清自己的暗黑\n\nPs：這輩子，只打算做好這一件事，孤單快樂",
+            "放慢一點，自己也需要被好好照顧\n\nPs：燃它起，瀰漫起發呆的花火氣",
             "喜歡的生活，偶爾慌亂，偶爾平穩，各有滋味",
             "隨順因緣，找到最恰當的行式前進",
             "每一個當下，都剛剛好，心若自在，萬事皆安",
@@ -405,6 +388,25 @@
             "人生就是來一招拆一招，撐得起，也收得住"
         ];
 
+        // --- 2. 默契大考驗 (答案確認無誤) ---
+        const quizQuestions = [
+            {
+                q: "David 是哪裡人？",
+                options: ["台北", "台南", "高雄"], 
+                ans: 1 // 答案：台南 (第2個選項)
+            },
+            {
+                q: "他最愛透過什麼方式記錄生活？",
+                options: ["寫程式", "寫詩與攝影", "烹飪"],
+                ans: 1 // 答案：寫詩 (第2個選項)
+            },
+            {
+                q: "他最愛吃什麼食物（唯一支持）？",
+                options: ["牛肉麵", "水晶餃", "火鍋"],
+                ans: 1 // 答案：水晶餃 (第2個選項)
+            }
+        ];
+
         // --- 互動邏輯 ---
         const cardWrapper = document.getElementById('invitationCard');
         const card = cardWrapper.querySelector('.card');
@@ -412,22 +414,62 @@
         const modal = document.getElementById('rsvpModal');
         const openFormBtn = document.getElementById('openFormBtn');
         const closeFormBtn = document.getElementById('closeFormBtn');
+        
+        // 初始載入
+        window.addEventListener('DOMContentLoaded', () => {
+             const randomPoem = poems[Math.floor(Math.random() * poems.length)];
+             poemEl.textContent = randomPoem;
+        });
+        
+        let isQuizInited = false;
+        
+        cardWrapper.addEventListener('click', function(e) {
+            if (e.target.closest('.quiz-section') || e.target.closest('button')) return;
 
-        // 1. 點擊翻轉卡片 + 隨機選詩
-        cardWrapper.addEventListener('click', function() {
             if (!card.classList.contains('is-flipped')) {
-                // 隨機選一句詩
                 const randomPoem = poems[Math.floor(Math.random() * poems.length)];
                 poemEl.textContent = randomPoem;
                 
-                // 翻轉
+                if (!isQuizInited) {
+                    initQuiz();
+                    isQuizInited = true;
+                }
                 card.classList.add('is-flipped');
             }
         });
 
-        // 2. 表單開關
+        function initQuiz() {
+            const container = document.getElementById('quizContent');
+            const feedback = document.getElementById('quizFeedback');
+            const qData = quizQuestions[Math.floor(Math.random() * quizQuestions.length)];
+            
+            let html = `<div class="quiz-question">${qData.q}</div><div class="quiz-options">`;
+            qData.options.forEach((opt, idx) => {
+                html += `<button class="quiz-btn" onclick="checkAnswer(this, ${idx}, ${qData.ans})">${opt}</button>`;
+            });
+            html += `</div>`;
+            
+            container.innerHTML = html;
+            feedback.innerHTML = "";
+        }
+
+        window.checkAnswer = function(btn, choiceIdx, correctIdx) {
+            const allBtns = btn.parentElement.querySelectorAll('.quiz-btn');
+            const feedback = document.getElementById('quizFeedback');
+            allBtns.forEach(b => b.disabled = true);
+
+            if (choiceIdx === correctIdx) {
+                btn.classList.add('correct');
+                feedback.innerHTML = "<span style='color:var(--success); font-weight:bold'>🎉 答對了！真是懂 David 的好朋友！</span>";
+            } else {
+                btn.classList.add('wrong');
+                allBtns[correctIdx].classList.add('correct');
+                feedback.innerHTML = "<span style='color:var(--error)'>🙈 哎呀！差一點點！</span>";
+            }
+        }
+
         openFormBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // 防止觸發翻卡
+            e.stopPropagation();
             modal.classList.add('open');
         });
 
@@ -435,29 +477,22 @@
             modal.classList.remove('open');
         });
 
-        // 點擊遮罩關閉
         modal.addEventListener('click', (e) => {
             if (e.target === modal) modal.classList.remove('open');
         });
 
-        // 3. 表單送出 (正式版：串接 Notion)
         async function handleFormSubmit(event) {
             event.preventDefault();
-            
             const btn = event.target.querySelector('.submit-btn');
             const originalText = btn.textContent;
-            
-            // 鎖定按鈕避免重複發送
             btn.textContent = "資料傳送中...";
             btn.style.background = "#9CA3AF";
             btn.disabled = true;
 
-            // 收集資料
             const formData = new FormData(event.target);
             const data = Object.fromEntries(formData.entries());
 
             try {
-                // 呼叫我們剛剛寫好的後端程式
                 const response = await fetch('/api/submit', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -476,8 +511,7 @@
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('抱歉，傳送發生錯誤，請稍後再試，或是直接聯繫主辦人。\n錯誤原因：' + error.message);
-                // 失敗後恢復按鈕
+                alert('抱歉，傳送發生錯誤，請稍後再試。\n錯誤原因：' + error.message);
                 btn.textContent = originalText;
                 btn.style.background = "var(--accent)";
                 btn.disabled = false;
