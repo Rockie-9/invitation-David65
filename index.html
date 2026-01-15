@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>65 壽宴｜光影與詩的夜晚</title>
     
     <meta property="og:title" content="65 壽宴｜光影與詩的夜晚">
@@ -10,52 +10,69 @@
     <meta property="og:url" content="https://invitation-david65.vercel.app/">
     <meta property="og:type" content="website">
 
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Lato:wght@300;400&display=swap" rel="stylesheet">
+    
     <style>
-        /* --- Design Tokens --- */
+        /* --- 1. Design Tokens (設計系統) --- */
         :root {
-            --bg: #F6F3EE;         
-            --text: #1F2937;       
-            --muted: #6B7280;      
-            --card-bg: #FFFFFF;    
-            --accent: #8B6B2E;     
-            --primary: #2C3E50;    
-            --success: #10B981;    
-            --error: #EF4444;      
-            --line: #E5E7EB;       
-            --font-serif: 'Noto Serif TC', 'Songti TC', serif; 
-            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            /* Palette */
+            --bg-base: #F3F4F6;
+            --bg-gradient-start: #F6F3EE;
+            --bg-gradient-end: #E5E7EB;
+            --text-main: #1F2937;
+            --text-sub: #4B5563;
+            --text-muted: #9CA3AF;
+            
+            /* Theme Colors */
+            --accent: #8B6B2E;    /* 金棕色：用於邊框、強調字 */
+            --primary: #2C3E50;   /* 深藍灰：主視覺、按鈕 */
+            --surface: #FFFFFF;   /* 卡片背景 */
+            
+            /* Feedback */
+            --success: #10B981;
+            --error: #EF4444;
+            --focus-ring: rgba(139, 107, 46, 0.4);
+
+            /* Typography */
+            --font-serif: 'Noto Serif TC', serif;
+            --font-sans: 'Lato', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+            /* Spacing & Layout */
+            --card-width: min(90vw, 420px); /* 響應式寬度 */
+            --card-height: clamp(600px, 80vh, 750px); /* 響應式高度 */
+            --radius-lg: 16px;
+            --radius-md: 8px;
+            --radius-pill: 50px;
         }
 
-        * { box-sizing: border-box; }
-
+        /* --- 2. Global Reset & Base --- */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body {
             margin: 0;
-            background-color: var(--bg);
-            color: var(--text);
             font-family: var(--font-sans);
+            color: var(--text-main);
+            background: var(--bg-base);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
-            min-height: 100vh;
-            overscroll-behavior: none; 
-        }
-
-        .container {
-            width: 100%;
-            max-width: 450px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
             align-items: center;
-            position: relative;
+            overflow: hidden; /* 防止翻轉時出現捲軸 */
+            
+            /* 背景紋理：製造高級紙張感 */
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(255,255,255,0.8) 0%, rgba(0,0,0,0) 70%),
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            background-blend-mode: normal, overlay;
         }
 
-        .card-wrapper {
-            perspective: 1000px;
-            width: 100%;
-            height: 720px; /* 高度維持以容納內容 */
-            margin-top: 20px;
-            cursor: pointer;
+        /* --- 3. Card System (3D Flip) --- */
+        .scene {
+            width: var(--card-width);
+            height: var(--card-height);
+            perspective: 1200px; /* 加深透視感 */
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
         }
 
         .card {
@@ -63,316 +80,363 @@
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            border-radius: 12px;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 更有彈性的翻轉 */
+            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.15);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
         }
 
-        .card.is-flipped {
-            transform: rotateY(180deg);
-        }
+        .card.is-flipped { transform: rotateY(180deg); }
 
-        .card-face {
+        .card__face {
             position: absolute;
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border-radius: 12px;
+            border-radius: var(--radius-lg);
+            background: var(--surface);
             overflow: hidden;
-            background: var(--card-bg);
             display: flex;
             flex-direction: column;
-            align-items: center;
+            
+            /* iOS Safari 圓角溢出修正 */
+            -webkit-backface-visibility: hidden; 
+            transform: translate3d(0,0,0); 
         }
 
-        /* --- 正面 --- */
-        .front {
+        /* --- Front Face --- */
+        .card__face--front {
+            align-items: center;
             justify-content: center;
-            border: 1px solid var(--line);
-            background-image: linear-gradient(to bottom right, #fff, #f9f9f9);
+            background: linear-gradient(135deg, #fff 0%, #f9f7f5 100%);
         }
 
-        .front-border {
-            border: 2px solid var(--accent);
-            width: 90%;
-            height: 94%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+        .front-frame {
             position: relative;
+            width: 88%;
+            height: 92%;
+            border: 1.5px solid var(--accent);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
-        .title-sub {
-            font-size: 0.9rem;
-            color: var(--accent);
-            letter-spacing: 0.1em;
-            margin-bottom: 2rem;
-            text-transform: uppercase;
+        /* 裝飾性邊角 */
+        .front-frame::before, .front-frame::after {
+            content: ''; position: absolute; width: 10px; height: 10px;
+            border: 1.5px solid var(--accent); transition: all 0.3s ease;
+        }
+        .front-frame::before { top: -1.5px; left: -1.5px; border-right: none; border-bottom: none; }
+        .front-frame::after { bottom: -1.5px; right: -1.5px; border-left: none; border-top: none; }
+
+        .scene:hover .front-frame::before { transform: translate(4px, 4px); }
+        .scene:hover .front-frame::after { transform: translate(-4px, -4px); }
+
+        .title-eyebrow {
+            font-size: 0.75rem; color: var(--accent); letter-spacing: 0.25em;
+            margin-bottom: 1.5rem; text-transform: uppercase; font-weight: 600;
         }
 
         .title-main {
-            font-family: var(--font-serif);
-            font-size: 2rem;
-            color: var(--primary);
-            letter-spacing: 0.2em;
-            margin-bottom: 0.5rem;
-            text-align: center;
+            font-family: var(--font-serif); font-size: 2.25rem; color: var(--primary);
+            letter-spacing: 0.15em; line-height: 1.4; text-align: center; margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
+
+        .symbol { font-size: 3.5rem; color: var(--accent); margin: 2rem 0; opacity: 0.8; }
 
         .tap-hint {
-            margin-top: 3rem;
-            font-size: 0.8rem;
-            color: var(--muted);
-            animation: pulse 2s infinite;
+            position: absolute; bottom: 2rem;
+            font-size: 0.8rem; color: var(--text-muted); letter-spacing: 0.1em;
+            display: flex; align-items: center; gap: 6px;
+            animation: pulse 2s infinite ease-in-out;
         }
+        .tap-hint::before { content: '👆'; font-size: 1rem; }
 
-        /* --- 背面 --- */
-        .back {
+        /* --- Back Face --- */
+        .card__face--back {
             transform: rotateY(180deg);
-            padding: 25px 20px;
-            text-align: center;
+            padding: 2rem;
+            background: #fff;
+        }
+
+        /* 內容捲動區 - 隱藏捲軸但可捲動 */
+        .scroll-container {
+            flex: 1;
             overflow-y: auto;
+            padding-bottom: 20px;
+            scrollbar-width: none; /* Firefox */
+        }
+        .scroll-container::-webkit-scrollbar { display: none; }
+
+        .poem-container {
+            text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--bg-gradient-end);
         }
 
-        .poem-section {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--line);
-            width: 100%;
+        .tag {
+            display: inline-block; font-size: 0.7rem; color: var(--accent);
+            border: 1px solid var(--accent); padding: 2px 10px; border-radius: 20px;
+            margin-bottom: 1rem; letter-spacing: 0.05em;
         }
 
-        .poem-tag {
-            font-size: 0.75rem;
-            color: var(--accent);
-            border: 1px solid var(--accent);
-            padding: 2px 8px;
-            border-radius: 20px;
-            margin-bottom: 10px;
-            display: inline-block;
+        .poem-content {
+            font-family: var(--font-serif); font-size: 1.1rem; line-height: 1.8;
+            color: var(--primary); font-style: italic; white-space: pre-line;
         }
 
-        .poem-text {
-            font-family: var(--font-serif);
-            font-size: 1.05rem;
-            line-height: 1.6;
-            color: var(--primary);
-            font-style: italic;
-            margin: 0;
-            white-space: pre-line;
+        /* 遊戲區塊優化 */
+        .quiz-card {
+            background: #FFFCF5; border: 1px dashed rgba(139, 107, 46, 0.3);
+            border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.5rem;
         }
 
-        .quiz-section {
-            width: 100%;
-            background: #FDFBF7;
-            border: 1px dashed var(--accent);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .quiz-title {
-            font-size: 0.9rem;
-            color: var(--accent);
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-align: center;
+        .quiz-header {
+            font-size: 0.9rem; font-weight: 700; color: var(--accent);
+            margin-bottom: 1rem; text-align: center; letter-spacing: 0.05em;
         }
 
         .quiz-question {
-            font-size: 1rem;
-            font-weight: bold;
-            color: var(--primary);
-            margin-bottom: 12px;
+            font-size: 1rem; font-weight: 600; color: var(--primary); margin-bottom: 1rem;
         }
 
-        .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+        .quiz-options { display: flex; flex-direction: column; gap: 0.5rem; }
 
-        .quiz-btn {
-            background: #fff; border: 1px solid #D1D5DB; padding: 8px 12px;
-            border-radius: 6px; text-align: left; cursor: pointer;
-            transition: all 0.2s; font-size: 0.9rem; color: var(--text);
+        .btn-option {
+            background: #fff; border: 1px solid #E5E7EB; padding: 10px 14px;
+            border-radius: 6px; text-align: left; font-size: 0.95rem; color: var(--text-sub);
+            cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
         }
-        .quiz-btn:hover { border-color: var(--accent); background: #FFFBEB; }
-        .quiz-btn.correct { background: var(--success); color: white; border-color: var(--success); }
-        .quiz-btn.wrong { background: var(--error); color: white; border-color: var(--error); animation: shake 0.4s; }
-
-        .quiz-feedback { font-size: 0.85rem; margin-top: 10px; text-align: center; min-height: 1.2em; }
-
-        .info-grid {
-            display: grid; grid-template-columns: auto 1fr; gap: 8px 12px;
-            text-align: left; font-size: 0.9rem; color: var(--text);
-            margin-bottom: 20px; background: #F9FAFB; padding: 12px; border-radius: 8px;
-        }
-        .info-label { color: var(--accent); font-weight: bold; font-family: var(--font-serif); }
         
-        .transport-info {
-            grid-column: 1 / -1;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px dashed var(--line);
-            font-size: 0.85rem;
-            color: var(--muted);
+        /* PC Hover 效果 */
+        @media (hover: hover) {
+            .btn-option:hover:not(:disabled) {
+                border-color: var(--accent); background: #FFFDF8; transform: translateX(4px);
+            }
         }
-        .transport-item { display: flex; gap: 5px; margin-bottom: 4px; }
 
-        .rsvp-btn {
-            background-color: var(--primary); color: #fff; border: none; padding: 14px 40px;
-            font-size: 1rem; border-radius: 50px; cursor: pointer;
-            box-shadow: 0 4px 12px rgba(31, 41, 55, 0.2); width: 100%; margin-top: auto;
-        }
-        .rsvp-btn:active { transform: scale(0.98); }
+        .btn-option.correct { background: var(--success); color: #fff; border-color: var(--success); }
+        .btn-option.wrong { background: var(--error); color: #fff; border-color: var(--error); }
 
-        /* Modal & Form */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: flex-end;
-            z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
+        /* 資訊區 */
+        .info-box {
+            background: #F8FAFC; border-radius: var(--radius-md);
+            padding: 1.25rem; margin-bottom: 1.5rem; font-size: 0.9rem;
         }
-        .modal-overlay.open { opacity: 1; pointer-events: auto; }
-        .modal-content {
-            background: #fff; width: 100%; max-width: 450px;
-            border-radius: 20px 20px 0 0; padding: 30px;
-            max-height: 90vh; overflow-y: auto;
-            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+
+        .info-row {
+            display: grid; grid-template-columns: 60px 1fr; gap: 0.5rem; margin-bottom: 0.75rem;
         }
-        .modal-overlay.open .modal-content { transform: translateY(0); }
-        .form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .info-row:last-child { margin-bottom: 0; }
+        .info-label { color: var(--accent); font-weight: 600; font-family: var(--font-serif); }
+        .info-value { color: var(--text-main); line-height: 1.5; }
+
+        .transport-box {
+            margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed #E2E8F0;
+            font-size: 0.85rem; color: var(--text-sub);
+        }
+        .transport-item { margin-bottom: 4px; display: flex; gap: 6px; }
+
+        /* CTA 按鈕 */
+        .btn-cta {
+            width: 100%; padding: 16px; background: var(--primary); color: #fff;
+            border: none; border-radius: var(--radius-pill); font-size: 1rem; font-weight: 600;
+            letter-spacing: 0.05em; cursor: pointer;
+            box-shadow: 0 4px 14px rgba(44, 62, 80, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: auto; /* 推到底部 */
+        }
+
+        .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(44, 62, 80, 0.4); }
+        .btn-cta:active { transform: scale(0.98); }
+
+        /* --- 4. Modal System (Glassmorphism) --- */
+        .modal-backdrop {
+            position: fixed; inset: 0; z-index: 1000;
+            background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(4px);
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            display: flex; justify-content: center; align-items: flex-end; /* Mobile default */
+        }
+        
+        .modal-backdrop.open { opacity: 1; pointer-events: auto; }
+
+        .modal-panel {
+            background: rgba(255, 255, 255, 0.95);
+            width: 100%; max-width: 500px;
+            border-radius: 24px 24px 0 0;
+            padding: 2rem;
+            max-height: 85vh; overflow-y: auto;
+            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+        }
+
+        .modal-backdrop.open .modal-panel { transform: translateY(0); }
+
+        /* PC Modal 優化 */
+        @media (min-width: 768px) {
+            .modal-backdrop { align-items: center; }
+            .modal-panel {
+                border-radius: 24px;
+                transform: scale(0.95) translateY(20px); opacity: 0;
+            }
+            .modal-backdrop.open .modal-panel {
+                transform: scale(1) translateY(0); opacity: 1;
+            }
+        }
+
+        /* Form Elements */
+        .form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
         .form-title { font-family: var(--font-serif); font-size: 1.5rem; color: var(--primary); margin: 0; }
-        .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--muted); }
-        .form-group { margin-bottom: 15px; text-align: left; }
-        label { display: block; margin-bottom: 5px; font-size: 0.9rem; color: var(--text); font-weight: 500; }
-        input[type="text"], input[type="number"], select, textarea {
-            width: 100%; padding: 12px; border: 1px solid var(--line);
-            border-radius: 8px; font-size: 1rem; background: #F9FAFB; font-family: var(--font-sans);
-        }
-        .radio-group { display: flex; gap: 15px; }
-        .radio-label { display: flex; align-items: center; gap: 5px; font-weight: normal;}
-        .submit-btn {
-            width: 100%; padding: 15px; background: var(--accent); color: white;
-            border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold;
-            margin-top: 10px; cursor: pointer;
+        .btn-close {
+            background: transparent; border: none; font-size: 2rem; line-height: 1;
+            color: var(--text-muted); cursor: pointer; padding: 0 8px;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 0.6; transform: translateY(0); }
-            50% { opacity: 1; transform: translateY(-5px); }
+        .form-field { margin-bottom: 1.25rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 600; color: var(--text-main); }
+        .required { color: var(--error); margin-left: 2px; }
+
+        .input-base {
+            width: 100%; padding: 12px 16px; border: 1px solid #E5E7EB; border-radius: var(--radius-md);
+            font-size: 1rem; font-family: inherit; background: #F9FAFB; transition: all 0.2s;
         }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+        .input-base:focus {
+            outline: none; border-color: var(--accent); background: #fff;
+            box-shadow: 0 0 0 3px var(--focus-ring);
         }
+
+        .radio-group { display: flex; flex-wrap: wrap; gap: 1rem; }
+        .radio-item { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .radio-item input { accent-color: var(--accent); width: 1.1em; height: 1.1em; }
+
+        .highlight-box {
+            background: #FFFBEB; border: 1px solid #FCD34D;
+            padding: 1rem; border-radius: var(--radius-md);
+        }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.05); opacity: 1; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-4px); } 40%, 80% { transform: translateX(4px); } }
+
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="card-wrapper" id="invitationCard">
-            <div class="card">
-                <div class="card-face front">
-                    <div class="front-border">
-                        <div class="title-sub">INVITATION</div>
-                        <div class="title-main">光影與詩<br>的夜晚</div>
-                        <div style="font-size: 3rem; color:var(--accent); margin: 20px 0;">❦</div>
-                        <div class="tap-hint">點擊開啟 · 默契大考驗</div>
-                    </div>
-                </div>
-
-                <div class="card-face back">
-                    <div class="poem-section">
-                        <div class="poem-tag">David 原創詩選</div>
-                        <p class="poem-text" id="randomPoem">...</p>
-                    </div>
-
-                    <div class="quiz-section" id="quizContainer">
-                        <div class="quiz-title">🧩 David 默契大考驗</div>
-                        <div id="quizContent"></div>
-                        <div class="quiz-feedback" id="quizFeedback"></div>
-                    </div>
-
-                    <div class="info-grid">
-                        <div class="info-label">時間</div>
-                        <div>2026/02/07 (六) 17:30</div>
-                        
-                        <div class="info-label">地點</div>
-                        <div>碧海廚房－敦北店<br><span style="font-size:0.85rem; color:var(--muted)">北市松山區敦化北路155巷10號1樓</span></div>
-                        
-                        <div class="transport-info">
-                            <div class="transport-item">🚇 <strong>捷運+步行：</strong>小巨蛋站 1 號出口，步行約 8 分鐘</div>
-                            <div class="transport-item">🚗 <strong>開車前往：</strong>建議停放於臺北田徑場停車場</div>
-                        </div>
-                    </div>
-
-                    <button class="rsvp-btn" id="openFormBtn">確認出席，與您相聚</button>
+    <main class="scene" id="invitationCard">
+        <div class="card">
+            <div class="card__face card__face--front">
+                <div class="front-frame">
+                    <div class="title-eyebrow">INVITATION</div>
+                    <h1 class="title-main">光影與詩<br>的夜晚</h1>
+                    <div class="symbol">❦</div>
+                    <div class="tap-hint">點擊開啟 · 默契大考驗</div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="modal-overlay" id="rsvpModal">
-        <div class="modal-content">
+            <div class="card__face card__face--back">
+                <div class="scroll-container">
+                    <section class="poem-container">
+                        <span class="tag">David 原創詩選</span>
+                        <p class="poem-content" id="randomPoem">...</p>
+                    </section>
+
+                    <section class="quiz-card" id="quizContainer">
+                        <div class="quiz-header">🧩 David 默契大考驗</div>
+                        <div id="quizContent"></div>
+                        <div id="quizFeedback" style="text-align:center; min-height:1.2em; margin-top:10px; font-size:0.9rem;"></div>
+                    </section>
+
+                    <section class="info-box">
+                        <div class="info-row">
+                            <span class="info-label">時間</span>
+                            <span class="info-value">2026/02/07 (六) 17:30</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">地點</span>
+                            <span class="info-value">碧海廚房－敦北店<br><span style="color:var(--text-sub); font-size:0.85em">北市松山區敦化北路155巷10號1樓</span></span>
+                        </div>
+                        <div class="transport-box">
+                            <div class="transport-item">🚇 <strong>捷運+步行：</strong>小巨蛋站 1 號出口，8 分鐘</div>
+                            <div class="transport-item">🚗 <strong>開車前往：</strong>建議停放臺北田徑場</div>
+                        </div>
+                    </section>
+                </div>
+
+                <button class="btn-cta" id="openFormBtn">確認出席，與您相聚</button>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-backdrop" id="rsvpModal">
+        <div class="modal-panel">
             <div class="form-header">
                 <h2 class="form-title">登記席位</h2>
-                <button class="close-btn" id="closeFormBtn">×</button>
+                <button class="btn-close" id="closeFormBtn">&times;</button>
             </div>
             
             <form id="rsvpForm" onsubmit="handleFormSubmit(event)">
-                <div class="form-group">
-                    <label>您的姓名 / 暱稱 <span style="color:red">*</span></label>
-                    <input type="text" name="name" required placeholder="請輸入姓名">
+                <div class="form-field">
+                    <label class="form-label">您的姓名 / 暱稱 <span class="required">*</span></label>
+                    <input type="text" name="name" class="input-base" required placeholder="請輸入姓名">
                 </div>
-                <div class="form-group">
-                    <label>出席狀態 <span style="color:red">*</span></label>
+                
+                <div class="form-field">
+                    <label class="form-label">出席狀態 <span class="required">*</span></label>
                     <div class="radio-group">
-                        <label class="radio-label"><input type="radio" name="attendance" value="出席" checked required> 準時出席</label>
-                        <label class="radio-label"><input type="radio" name="attendance" value="遺憾缺席"> 遺憾缺席</label>
+                        <label class="radio-item"><input type="radio" name="attendance" value="出席" checked required> 準時出席</label>
+                        <label class="radio-item"><input type="radio" name="attendance" value="遺憾缺席"> 遺憾缺席</label>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>出席人數 <span style="color:red">*</span></label>
-                    <input type="number" name="people" value="1" min="1" max="5" required>
+
+                <div class="form-field">
+                    <label class="form-label">出席人數 <span class="required">*</span></label>
+                    <input type="number" name="people" class="input-base" value="1" min="1" max="5" required>
                 </div>
-                <div class="form-group">
-                    <label>飲食習慣 <span style="color:red">*</span></label>
+
+                <div class="form-field">
+                    <label class="form-label">飲食習慣 <span class="required">*</span></label>
                     <div class="radio-group">
-                        <label class="radio-label"><input type="radio" name="dietType" value="葷" checked required> 葷食</label>
-                        <label class="radio-label"><input type="radio" name="dietType" value="素"> 素食</label>
+                        <label class="radio-item"><input type="radio" name="dietType" value="葷" checked required> 葷食</label>
+                        <label class="radio-item"><input type="radio" name="dietType" value="素"> 素食</label>
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>飲食禁忌 / 過敏 (無請填「無」) <span style="color:red">*</span></label>
-                    <input type="text" name="restrictions" required placeholder="無請填「無」">
+
+                <div class="form-field">
+                    <label class="form-label">飲食禁忌 / 過敏 (無請填「無」) <span class="required">*</span></label>
+                    <input type="text" name="restrictions" class="input-base" required placeholder="無請填「無」">
                 </div>
-                <div class="form-group">
-                    <label>飲酒習慣 <span style="color:red">*</span></label>
-                    <select name="noAlcohol" required>
+
+                <div class="form-field">
+                    <label class="form-label">飲酒習慣 <span class="required">*</span></label>
+                    <select name="noAlcohol" class="input-base" required>
                         <option value="否">可以小酌</option>
                         <option value="是">當天完全不飲酒</option>
                     </select>
                 </div>
                 
-                <div class="form-group" style="background: #FFFBEB; padding: 10px; border-radius: 8px;">
-                    <label>20:30 用餐後，會想要續攤嗎？ <span style="color:red">*</span></label>
+                <div class="form-field highlight-box">
+                    <label class="form-label" style="color:#92400E">20:30 用餐後，會想要續攤嗎？ <span class="required">*</span></label>
                     <div class="radio-group">
-                        <label class="radio-label"><input type="radio" name="afterParty" value="想參加" required> 想參加</label>
-                        <label class="radio-label"><input type="radio" name="afterParty" value="先不用"> 先不用</label>
-                        <label class="radio-label"><input type="radio" name="afterParty" value="看當天狀況"> 看狀況</label>
+                        <label class="radio-item"><input type="radio" name="afterParty" value="想參加" required> 想參加</label>
+                        <label class="radio-item"><input type="radio" name="afterParty" value="先不用"> 先不用</label>
+                        <label class="radio-item"><input type="radio" name="afterParty" value="看當天狀況"> 看狀況</label>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label>給壽星的一句祝福 <span style="color:red">*</span></label>
-                    <textarea name="note" rows="2" required placeholder="請留下一句話..."></textarea>
+                <div class="form-field">
+                    <label class="form-label">給壽星的一句祝福 <span class="required">*</span></label>
+                    <textarea name="note" class="input-base" rows="3" required placeholder="請留下一句話..."></textarea>
                 </div>
-                <button type="submit" class="submit-btn">確認送出</button>
+
+                <button type="submit" class="btn-cta">確認送出</button>
             </form>
         </div>
     </div>
 
     <script>
-        // --- 1. 詩詞 (新舊整合共12首) ---
+        // Data
         const poems = [
             "相遇，其實是借對方的光，來看清自己的暗黑\n\nPs：這輩子，只打算做好這一件事，孤單快樂",
             "放慢一點，自己也需要被好好照顧\n\nPs：燃它起，瀰漫起發呆的花火氣",
@@ -388,47 +452,34 @@
             "人生就是來一招拆一招，撐得起，也收得住"
         ];
 
-        // --- 2. 默契大考驗 (答案確認無誤) ---
         const quizQuestions = [
-            {
-                q: "David 是哪裡人？",
-                options: ["台北", "台南", "高雄"], 
-                ans: 1 // 答案：台南 (第2個選項)
-            },
-            {
-                q: "他最愛透過什麼方式記錄生活？",
-                options: ["寫程式", "寫詩與攝影", "烹飪"],
-                ans: 1 // 答案：寫詩 (第2個選項)
-            },
-            {
-                q: "他最愛吃什麼食物（唯一支持）？",
-                options: ["牛肉麵", "水晶餃", "火鍋"],
-                ans: 1 // 答案：水晶餃 (第2個選項)
-            }
+            { q: "David 是哪裡人？", options: ["台北", "台南", "高雄"], ans: 1 },
+            { q: "他最愛透過什麼方式記錄生活？", options: ["寫程式", "寫詩與攝影", "烹飪"], ans: 1 },
+            { q: "他最愛吃什麼食物（唯一支持）？", options: ["牛肉麵", "水晶餃", "火鍋"], ans: 1 }
         ];
 
-        // --- 互動邏輯 ---
-        const cardWrapper = document.getElementById('invitationCard');
-        const card = cardWrapper.querySelector('.card');
+        // Elements
+        const cardScene = document.getElementById('invitationCard');
+        const card = cardScene.querySelector('.card');
         const poemEl = document.getElementById('randomPoem');
         const modal = document.getElementById('rsvpModal');
-        const openFormBtn = document.getElementById('openFormBtn');
-        const closeFormBtn = document.getElementById('closeFormBtn');
-        
-        // 初始載入
-        window.addEventListener('DOMContentLoaded', () => {
-             const randomPoem = poems[Math.floor(Math.random() * poems.length)];
-             poemEl.textContent = randomPoem;
-        });
-        
+        const openBtn = document.getElementById('openFormBtn');
+        const closeBtn = document.getElementById('closeFormBtn');
         let isQuizInited = false;
-        
-        cardWrapper.addEventListener('click', function(e) {
-            if (e.target.closest('.quiz-section') || e.target.closest('button')) return;
 
+        // Init
+        window.addEventListener('DOMContentLoaded', () => {
+             poemEl.textContent = poems[Math.floor(Math.random() * poems.length)];
+        });
+
+        // Flip Logic
+        cardScene.addEventListener('click', (e) => {
+            // 避免點擊內部按鈕時觸發翻轉
+            if (e.target.closest('button') || e.target.closest('.quiz-card') || e.target.closest('a')) return;
+            
             if (!card.classList.contains('is-flipped')) {
-                const randomPoem = poems[Math.floor(Math.random() * poems.length)];
-                poemEl.textContent = randomPoem;
+                // 翻轉時更新詩句
+                poemEl.textContent = poems[Math.floor(Math.random() * poems.length)];
                 
                 if (!isQuizInited) {
                     initQuiz();
@@ -438,6 +489,7 @@
             }
         });
 
+        // Quiz Logic
         function initQuiz() {
             const container = document.getElementById('quizContent');
             const feedback = document.getElementById('quizFeedback');
@@ -445,16 +497,15 @@
             
             let html = `<div class="quiz-question">${qData.q}</div><div class="quiz-options">`;
             qData.options.forEach((opt, idx) => {
-                html += `<button class="quiz-btn" onclick="checkAnswer(this, ${idx}, ${qData.ans})">${opt}</button>`;
+                html += `<button class="btn-option" onclick="checkAnswer(this, ${idx}, ${qData.ans})">${opt}</button>`;
             });
             html += `</div>`;
-            
             container.innerHTML = html;
             feedback.innerHTML = "";
         }
 
         window.checkAnswer = function(btn, choiceIdx, correctIdx) {
-            const allBtns = btn.parentElement.querySelectorAll('.quiz-btn');
+            const allBtns = btn.parentElement.querySelectorAll('.btn-option');
             const feedback = document.getElementById('quizFeedback');
             allBtns.forEach(b => b.disabled = true);
 
@@ -468,25 +519,26 @@
             }
         }
 
-        openFormBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
+        // Modal Logic
+        openBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // 防止翻轉
             modal.classList.add('open');
         });
 
-        closeFormBtn.addEventListener('click', () => {
-            modal.classList.remove('open');
-        });
-
+        const closeModal = () => modal.classList.remove('open');
+        closeBtn.addEventListener('click', closeModal);
         modal.addEventListener('click', (e) => {
-            if (e.target === modal) modal.classList.remove('open');
+            if (e.target === modal) closeModal();
         });
 
+        // Form Submit
         async function handleFormSubmit(event) {
             event.preventDefault();
-            const btn = event.target.querySelector('.submit-btn');
+            const btn = event.target.querySelector('button[type="submit"]');
             const originalText = btn.textContent;
-            btn.textContent = "資料傳送中...";
-            btn.style.background = "#9CA3AF";
+            
+            btn.textContent = "傳送中...";
+            btn.style.opacity = "0.7";
             btn.disabled = true;
 
             const formData = new FormData(event.target);
@@ -503,17 +555,16 @@
 
                 if (result.success) {
                     alert(`謝謝 ${data.name}，我們已成功收到您的回覆！`);
-                    document.getElementById('rsvpModal').classList.remove('open');
+                    closeModal();
                     btn.textContent = "已報名成功";
-                    btn.style.background = "var(--accent)";
                 } else {
                     throw new Error(result.error || '傳送失敗');
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('抱歉，傳送發生錯誤，請稍後再試。\n錯誤原因：' + error.message);
+                alert('抱歉，傳送發生錯誤。\n原因：' + error.message);
                 btn.textContent = originalText;
-                btn.style.background = "var(--accent)";
+                btn.style.opacity = "1";
                 btn.disabled = false;
             }
         }
