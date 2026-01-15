@@ -17,15 +17,13 @@
         :root {
             /* Palette */
             --bg-base: #F3F4F6;
-            --bg-gradient-start: #F6F3EE;
-            --bg-gradient-end: #E5E7EB;
             --text-main: #1F2937;
             --text-sub: #4B5563;
             --text-muted: #9CA3AF;
             
             /* Theme Colors */
-            --accent: #8B6B2E;    /* 金棕色：用於邊框、強調字 */
-            --primary: #2C3E50;   /* 深藍灰：主視覺、按鈕 */
+            --accent: #8B6B2E;    /* 金棕色 */
+            --primary: #2C3E50;   /* 深藍灰 */
             --surface: #FFFFFF;   /* 卡片背景 */
             
             /* Feedback */
@@ -37,9 +35,11 @@
             --font-serif: 'Noto Serif TC', serif;
             --font-sans: 'Lato', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
-            /* Spacing & Layout */
-            --card-width: min(90vw, 420px); /* 響應式寬度 */
-            --card-height: clamp(600px, 80vh, 750px); /* 響應式高度 */
+            /* Spacing & Layout - 解決遮擋的關鍵 */
+            --card-width: min(90vw, 420px); /* 手機版佔90%，最大不超過420px */
+            /* 高度使用 clamp 動態調整：最小640px，理想是螢幕高的80%，最大780px */
+            --card-height: clamp(640px, 80vh, 780px); 
+            
             --radius-lg: 16px;
             --radius-md: 8px;
             --radius-pill: 50px;
@@ -57,9 +57,9 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden; /* 防止翻轉時出現捲軸 */
+            overflow: hidden; /* 防止翻轉時出現不必要的卷軸 */
             
-            /* 背景紋理：製造高級紙張感 */
+            /* 背景紋理優化：製造高級紙張感 */
             background-image: 
                 radial-gradient(circle at 50% 0%, rgba(255,255,255,0.8) 0%, rgba(0,0,0,0) 70%),
                 url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
@@ -70,7 +70,7 @@
         .scene {
             width: var(--card-width);
             height: var(--card-height);
-            perspective: 1200px; /* 加深透視感 */
+            perspective: 1200px;
             opacity: 0;
             animation: fadeIn 1s ease-out forwards;
         }
@@ -80,7 +80,7 @@
             height: 100%;
             position: relative;
             transform-style: preserve-3d;
-            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 更有彈性的翻轉 */
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.15);
             border-radius: var(--radius-lg);
             cursor: pointer;
@@ -98,10 +98,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            
-            /* iOS Safari 圓角溢出修正 */
             -webkit-backface-visibility: hidden; 
-            transform: translate3d(0,0,0); 
         }
 
         /* --- Front Face --- */
@@ -130,9 +127,6 @@
         .front-frame::before { top: -1.5px; left: -1.5px; border-right: none; border-bottom: none; }
         .front-frame::after { bottom: -1.5px; right: -1.5px; border-left: none; border-top: none; }
 
-        .scene:hover .front-frame::before { transform: translate(4px, 4px); }
-        .scene:hover .front-frame::after { transform: translate(-4px, -4px); }
-
         .title-eyebrow {
             font-size: 0.75rem; color: var(--accent); letter-spacing: 0.25em;
             margin-bottom: 1.5rem; text-transform: uppercase; font-weight: 600;
@@ -152,27 +146,30 @@
             display: flex; align-items: center; gap: 6px;
             animation: pulse 2s infinite ease-in-out;
         }
-        .tap-hint::before { content: '👆'; font-size: 1rem; }
 
         /* --- Back Face --- */
         .card__face--back {
             transform: rotateY(180deg);
-            padding: 2rem;
+            padding: 2rem 1.5rem; /* 左右邊距稍微縮小以增加內容空間 */
             background: #fff;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* 內容捲動區 - 隱藏捲軸但可捲動 */
+        /* 關鍵：內容捲動區 - 確保內容多時可以捲動，不遮擋按鈕 */
         .scroll-container {
             flex: 1;
             overflow-y: auto;
             padding-bottom: 20px;
             scrollbar-width: none; /* Firefox */
+            mask-image: linear-gradient(to bottom, black 90%, transparent 100%); /* 底部漸層消失效果 */
+            -webkit-mask-image: linear-gradient(to bottom, black 90%, transparent 100%);
         }
         .scroll-container::-webkit-scrollbar { display: none; }
 
         .poem-container {
             text-align: center; margin-bottom: 2rem; padding-bottom: 1.5rem;
-            border-bottom: 1px solid var(--bg-gradient-end);
+            border-bottom: 1px solid #E5E7EB;
         }
 
         .tag {
@@ -183,7 +180,7 @@
 
         .poem-content {
             font-family: var(--font-serif); font-size: 1.1rem; line-height: 1.8;
-            color: var(--primary); font-style: italic; white-space: pre-line;
+            color: var(--primary); font-style: italic; white-space: pre-line; margin: 0;
         }
 
         /* 遊戲區塊優化 */
@@ -206,29 +203,22 @@
         .btn-option {
             background: #fff; border: 1px solid #E5E7EB; padding: 10px 14px;
             border-radius: 6px; text-align: left; font-size: 0.95rem; color: var(--text-sub);
-            cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden;
+            cursor: pointer; transition: all 0.2s; position: relative;
         }
         
-        /* PC Hover 效果 */
-        @media (hover: hover) {
-            .btn-option:hover:not(:disabled) {
-                border-color: var(--accent); background: #FFFDF8; transform: translateX(4px);
-            }
-        }
-
+        .btn-option:active { background: #f3f3f3; }
         .btn-option.correct { background: var(--success); color: #fff; border-color: var(--success); }
         .btn-option.wrong { background: var(--error); color: #fff; border-color: var(--error); }
 
         /* 資訊區 */
         .info-box {
             background: #F8FAFC; border-radius: var(--radius-md);
-            padding: 1.25rem; margin-bottom: 1.5rem; font-size: 0.9rem;
+            padding: 1.25rem; margin-bottom: 1rem; font-size: 0.9rem;
         }
 
         .info-row {
             display: grid; grid-template-columns: 60px 1fr; gap: 0.5rem; margin-bottom: 0.75rem;
         }
-        .info-row:last-child { margin-bottom: 0; }
         .info-label { color: var(--accent); font-weight: 600; font-family: var(--font-serif); }
         .info-value { color: var(--text-main); line-height: 1.5; }
 
@@ -238,31 +228,28 @@
         }
         .transport-item { margin-bottom: 4px; display: flex; gap: 6px; }
 
-        /* CTA 按鈕 */
+        /* CTA 按鈕 (固定在底部，確保不被遮住) */
         .btn-cta {
             width: 100%; padding: 16px; background: var(--primary); color: #fff;
             border: none; border-radius: var(--radius-pill); font-size: 1rem; font-weight: 600;
-            letter-spacing: 0.05em; cursor: pointer;
+            letter-spacing: 0.05em; cursor: pointer; flex-shrink: 0;
             box-shadow: 0 4px 14px rgba(44, 62, 80, 0.3);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            margin-top: auto; /* 推到底部 */
+            transition: all 0.3s;
+            margin-top: 10px;
         }
-
-        .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(44, 62, 80, 0.4); }
         .btn-cta:active { transform: scale(0.98); }
 
         /* --- 4. Modal System (Glassmorphism) --- */
         .modal-backdrop {
             position: fixed; inset: 0; z-index: 1000;
-            background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px);
             opacity: 0; pointer-events: none; transition: opacity 0.3s;
-            display: flex; justify-content: center; align-items: flex-end; /* Mobile default */
+            display: flex; justify-content: center; align-items: flex-end;
         }
-        
         .modal-backdrop.open { opacity: 1; pointer-events: auto; }
 
         .modal-panel {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.96);
             width: 100%; max-width: 500px;
             border-radius: 24px 24px 0 0;
             padding: 2rem;
@@ -270,56 +257,37 @@
             transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
         }
-
         .modal-backdrop.open .modal-panel { transform: translateY(0); }
-
-        /* PC Modal 優化 */
-        @media (min-width: 768px) {
-            .modal-backdrop { align-items: center; }
-            .modal-panel {
-                border-radius: 24px;
-                transform: scale(0.95) translateY(20px); opacity: 0;
-            }
-            .modal-backdrop.open .modal-panel {
-                transform: scale(1) translateY(0); opacity: 1;
-            }
-        }
 
         /* Form Elements */
         .form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
         .form-title { font-family: var(--font-serif); font-size: 1.5rem; color: var(--primary); margin: 0; }
-        .btn-close {
-            background: transparent; border: none; font-size: 2rem; line-height: 1;
-            color: var(--text-muted); cursor: pointer; padding: 0 8px;
-        }
+        .btn-close { background: transparent; border: none; font-size: 2rem; color: var(--text-muted); cursor: pointer; }
 
         .form-field { margin-bottom: 1.25rem; }
-        .form-label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 600; color: var(--text-main); }
-        .required { color: var(--error); margin-left: 2px; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 600; }
+        .required { color: var(--error); }
 
         .input-base {
             width: 100%; padding: 12px 16px; border: 1px solid #E5E7EB; border-radius: var(--radius-md);
-            font-size: 1rem; font-family: inherit; background: #F9FAFB; transition: all 0.2s;
+            font-size: 1rem; background: #F9FAFB;
         }
-        .input-base:focus {
-            outline: none; border-color: var(--accent); background: #fff;
-            box-shadow: 0 0 0 3px var(--focus-ring);
-        }
+        .input-base:focus { outline: none; border-color: var(--accent); background: #fff; }
 
         .radio-group { display: flex; flex-wrap: wrap; gap: 1rem; }
-        .radio-item { display: flex; align-items: center; gap: 6px; cursor: pointer; }
-        .radio-item input { accent-color: var(--accent); width: 1.1em; height: 1.1em; }
-
-        .highlight-box {
-            background: #FFFBEB; border: 1px solid #FCD34D;
-            padding: 1rem; border-radius: var(--radius-md);
-        }
+        .radio-item { display: flex; align-items: center; gap: 6px; }
+        .highlight-box { background: #FFFBEB; border: 1px solid #FCD34D; padding: 1rem; border-radius: var(--radius-md); }
 
         /* Animations */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.05); opacity: 1; } }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 20%, 60% { transform: translateX(-4px); } 40%, 80% { transform: translateX(4px); } }
 
+        /* PC 優化 */
+        @media (min-width: 768px) {
+            .modal-backdrop { align-items: center; }
+            .modal-panel { border-radius: 24px; transform: scale(0.95) translateY(20px); opacity: 0; }
+            .modal-backdrop.open .modal-panel { transform: scale(1) translateY(0); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -331,7 +299,7 @@
                     <div class="title-eyebrow">INVITATION</div>
                     <h1 class="title-main">光影與詩<br>的夜晚</h1>
                     <div class="symbol">❦</div>
-                    <div class="tap-hint">點擊開啟 · 默契大考驗</div>
+                    <div class="tap-hint">👆 點擊開啟 · 默契大考驗</div>
                 </div>
             </div>
 
