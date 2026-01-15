@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>65 壽宴｜光影與詩的夜晚</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- Design Tokens --- */
+        :root {
+            --bg: #F6F3EE;         /* 暖灰米白 */
+            --text: #1F2937;       /* 深灰黑 */
+            --muted: #6B7280;      /* 次要文字 */
+            --card-bg: #FFFFFF;    /* 卡片白 */
+            --accent: #8B6B2E;     /* 金棕色 (重點) */
+            --primary: #2C3E50;    /* 深藍灰 (主色) */
+            --line: #E5E7EB;       /* 分隔線 */
+            --font-serif: 'Noto Serif TC', 'Songti TC', serif; /* 詩意字體 */
+            --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; /* 資訊字體 */
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+            /* 手機版防滑動過度 */
+            overscroll-behavior: none; 
+        }
+
+        /* --- 容器與佈局 --- */
+        .container {
+            width: 100%;
+            max-width: 450px; /* 手機優先，限制最大寬度 */
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        /* --- 卡片互動區 (Flip Card) --- */
+        .card-wrapper {
+            perspective: 1000px;
+            width: 100%;
+            height: 550px; /* 卡片高度 */
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border-radius: 12px;
+        }
+
+        .card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            overflow: hidden;
+            background: var(--card-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- 卡片正面 --- */
+        .front {
+            justify-content: center;
+            border: 1px solid var(--line);
+            background-image: linear-gradient(to bottom right, #fff, #f9f9f9);
+        }
+
+        .front-border {
+            border: 2px solid var(--accent);
+            width: 90%;
+            height: 94%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .title-main {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            color: var(--primary);
+            letter-spacing: 0.2em;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .title-sub {
+            font-size: 0.9rem;
+            color: var(--accent);
+            letter-spacing: 0.1em;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+        }
+
+        .tap-hint {
+            margin-top: 3rem;
+            font-size: 0.8rem;
+            color: var(--muted);
+            animation: pulse 2s infinite;
+        }
+
+        /* --- 卡片背面 (內容區) --- */
+        .back {
+            transform: rotateY(180deg);
+            padding: 30px 20px;
+            text-align: center;
+            overflow-y: auto; /* 內容多時可捲動 */
+        }
+
+        .poem-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--line);
+            width: 100%;
+        }
+
+        .poem-text {
+            font-family: var(--font-serif);
+            font-size: 1.25rem;
+            line-height: 1.6;
+            color: var(--primary);
+            font-style: italic;
+            margin: 0;
+            white-space: pre-line; /* 保留換行 */
+        }
+
+        .intro-text {
+            font-size: 0.95rem;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 10px 15px;
+            text-align: left;
+            font-size: 0.95rem;
+            color: var(--text);
+            margin-bottom: 25px;
+            background: #F9FAFB;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .info-label {
+            color: var(--accent);
+            font-weight: bold;
+            font-family: var(--font-serif);
+        }
+
+        .rsvp-btn {
+            background-color: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 14px 40px;
+            font-size: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(31, 41, 55, 0.2);
+            transition: transform 0.2s;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .rsvp-btn:active { transform: scale(0.98); }
+
+        /* --- Modal 表單 (隱藏層) --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: flex-end; /* 手機版從下方滑出 */
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: #fff;
+            width: 100%;
+            max-width: 450px;
+            border-radius: 20px 20px 0 0;
+            padding: 30px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .modal-overlay.open .modal-content {
+            transform: translateY(0);
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .form-title {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--muted);
+        }
+
+        /* --- 表單樣式 --- */
+        .form-group { margin-bottom: 15px; text-align: left; }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        input[type="text"], input[type="number"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: #F9FAFB;
+            font-family: var(--font-sans);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: #fff;
+        }
+
+        .radio-group { display: flex; gap: 15px; }
+        .radio-label { display: flex; align-items: center; gap: 5px; font-weight: normal;}
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; transform: translateY(0); }
+            50% { opacity: 1; transform: translateY(-5px); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="card-wrapper" id="invitationCard">
+            <div class="card">
+                <div class="card-face front">
+                    <div class="front-border">
+                        <div class="title-sub">INVITATION</div>
+                        <div class="title-main">光影與詩<br>的夜晚</div>
+                        <div style="font-size: 3rem; color:var(--accent); margin: 20px 0;">❦</div>
+                        <div class="tap-hint">點擊開啟您的專屬詩句</div>
+                    </div>
+                </div>
+
+                <div class="card-face back">
+                    <div class="poem-section">
+                        <p class="poem-text" id="randomPoem">...</p>
+                    </div>
+
+                    <div class="intro-text">
+                        <p>誠摯邀請您，<br>與把生活拍成影像、寫成詩的人，<br>留下一張值得回看的合照。</p>
+                    </div>
+
+                    <div class="info-grid">
+                        <div class="info-label">時間</div>
+                        <div>2026/02/07 (六) 17:30 入座</div>
+                        
+                        <div class="info-label">地點</div>
+                        <div>碧海廚房－敦北店<br><span style="font-size:0.85rem; color:var(--muted)">臺北市松山區敦化北路155巷10號1樓</span></div>
+                    </div>
+
+                    <button class="rsvp-btn" id="openFormBtn">確認出席，與您相聚</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="rsvpModal">
+        <div class="modal-content">
+            <div class="form-header">
+                <h2 class="form-title">登記席位</h2>
+                <button class="close-btn" id="closeFormBtn">×</button>
+            </div>
+            
+            <form id="rsvpForm" onsubmit="handleFormSubmit(event)">
+                <div class="form-group">
+                    <label>您的姓名 / 暱稱 <span style="color:red">*</span></label>
+                    <input type="text" name="name" required placeholder="請輸入姓名">
+                </div>
+
+                <div class="form-group">
+                    <label>出席狀態</label>
+                    <div class="radio-group">
+                        <label class="radio-label"><input type="radio" name="attendance" value="出席" checked> 準時出席</label>
+                        <label class="radio-label"><input type="radio" name="attendance" value="遺憾缺席"> 遺憾缺席</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>出席人數 (含您自己)</label>
+                    <input type="number" name="people" value="1" min="1" max="5">
+                </div>
+
+                <div class="form-group">
+                    <label>飲食習慣</label>
+                    <div class="radio-group">
+                        <label class="radio-label"><input type="radio" name="dietType" value="葷" checked> 葷食</label>
+                        <label class="radio-label"><input type="radio" name="dietType" value="素"> 素食</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>飲食禁忌 / 過敏</label>
+                    <input type="text" name="restrictions" placeholder="無請填「無」">
+                </div>
+
+                <div class="form-group">
+                    <label>飲酒習慣</label>
+                    <select name="noAlcohol">
+                        <option value="否">可以小酌</option>
+                        <option value="是">當天完全不飲酒</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>給壽星的備註 (選填)</label>
+                    <textarea name="note" rows="2" placeholder="想說的話..."></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">確認送出</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- 資料：詩集庫 (來自您的圖片) ---
+        const poems = [
+            "喜歡的生活，偶爾慌亂，偶爾平穩，各有滋味",
+            "隨順因緣，找到最恰當的行式前進",
+            "每一個當下，都剛剛好，心若自在，萬事皆安",
+            "此有故彼有，此生故彼生，一切發生，都不是偶然",
+            "漸行漸遠的遺憾，且行且忘且隨風",
+            "任性的東奔西跑，都是孤獨的成全",
+            "在驚慌中尋找依靠，在遺落中期待復得",
+            "不是八面玲瓏的人，不討四海八荒的喜",
+            "能者多勞，智者多慮，無能者，無憂無慮",
+            "人生就是來一招拆一招，撐得起，也收得住"
+        ];
+
+        // --- 互動邏輯 ---
+        const cardWrapper = document.getElementById('invitationCard');
+        const card = cardWrapper.querySelector('.card');
+        const poemEl = document.getElementById('randomPoem');
+        const modal = document.getElementById('rsvpModal');
+        const openFormBtn = document.getElementById('openFormBtn');
+        const closeFormBtn = document.getElementById('closeFormBtn');
+
+        // 1. 點擊翻轉卡片 + 隨機選詩
+        cardWrapper.addEventListener('click', function() {
+            if (!card.classList.contains('is-flipped')) {
+                // 隨機選一句詩
+                const randomPoem = poems[Math.floor(Math.random() * poems.length)];
+                poemEl.textContent = randomPoem;
+                
+                // 翻轉
+                card.classList.add('is-flipped');
+            }
+        });
+
+        // 2. 表單開關
+        openFormBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // 防止觸發翻卡
+            modal.classList.add('open');
+        });
+
+        closeFormBtn.addEventListener('click', () => {
+            modal.classList.remove('open');
+        });
+
+        // 點擊遮罩關閉
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('open');
+        });
+
+        // 3. 表單送出 (目前為前端模擬)
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            // 收集資料
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            console.log('收集到的報名資料:', data);
+            
+            // 模擬成功
+            const btn = event.target.querySelector('.submit-btn');
+            const originalText = btn.textContent;
+            btn.textContent = "傳送中...";
+            btn.style.background = "#9CA3AF";
+
+            setTimeout(() => {
+                alert(`謝謝 ${data.name}，我們已收到您的回覆！\n(備註：這是一個前端演示，資料已印在 Console 中)`);
+                modal.classList.remove('open');
+                btn.textContent = "已報名";
+                btn.style.background = "var(--accent)";
+                btn.disabled = true;
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
