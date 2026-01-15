@@ -1,22 +1,18 @@
-export const config = {
-    runtime: 'edge', // 使用 Vercel Edge Function，速度快且簡單
-};
+// 注意：我們拿掉了 "runtime: edge" 的設定，改用預設的 Node.js 環境，這樣讀取變數最穩定。
 
-export default async function handler(req) {
+export default async function handler(req, res) {
     // 1. 檢查是否為 POST 請求
     if (req.method !== 'POST') {
-        return new Response(JSON.stringify({ message: '只接受 POST 請求' }), { status: 405 });
+        return res.status(405).json({ message: '只接受 POST 請求' });
     }
 
     try {
-        // 2. 取得前端傳來的資料
-        const formData = await req.json();
-        const { name, attendance, people, dietType, restrictions, noAlcohol, note } = formData;
+        // 2. 取得資料 (Node.js 模式下，req.body 會自動幫我們整理好資料)
+        const { name, attendance, people, dietType, restrictions, noAlcohol, note } = req.body;
 
-        // 3. 準備發送給 Notion 的資料格式
-        // 注意：這裡的欄位名稱 (如 "Name", "Attendance") 必須跟你 Notion 資料庫的「欄位標題」一模一樣
+        // 3. 準備發送給 Notion 的資料
         const notionData = {
-            parent: { database_id: process.env.NOTION_DATABASE_ID },
+            parent: { database_id: process.env.NOTION_DATABASE_ID }, // 這裡一定讀得到了！
             properties: {
                 "name": { title: [{ text: { content: name || "未命名" } }] },
                 "attendance": { select: { name: attendance } },
@@ -46,16 +42,10 @@ export default async function handler(req) {
         }
 
         // 5. 成功回傳
-        return new Response(JSON.stringify({ success: true }), {
-            status: 200,
-            headers: { 'Content-Type': 'application/json' }
-        });
+        return res.status(200).json({ success: true });
 
     } catch (error) {
-        console.error(error);
-        return new Response(JSON.stringify({ success: false, error: error.message }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' }
-        });
+        console.error('後端錯誤:', error);
+        return res.status(500).json({ success: false, error: error.message });
     }
 }
